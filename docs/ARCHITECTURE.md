@@ -1,0 +1,152 @@
+# SK Ledger 2.0 — Architecture
+
+## 1. Purpose
+
+This document defines implementation of the approved parity migration. `docs/PRD.md` is the product source of truth and `docs/DEVELOPMENT_PLAN.md` defines implementation order.
+
+## 2. Locked Technology Choices
+
+| Area | Choice | Rule |
+| --- | --- | --- |
+| Framework | Next.js App Router with JavaScript | Reuse the existing `app/` scaffold. Use Client Components only for browser interaction. |
+| Hosting | Netlify | Deploy the Next.js app directly. Netlify provisions SSR and Route Handlers through its Next.js adapter. |
+| Database | Existing MongoDB + Mongoose | Preserve existing data and models; use one cached connection helper. |
+| API | Next.js Route Handlers | Recreate Express API paths/contracts. No Express server, router, CORS layer, or `app.listen`. |
+| Authentication | Custom JWT in HTTP-only `token` cookie | Preserve the existing session contract; do not introduce an auth framework. |
+| Passwords | bcrypt | Retain secure hashing/comparison. Password hashes are server-only. |
+| Google sign-in | `google-auth-library` + credential-post endpoint | Verify credentials server-side; support account creation and email-based linking. |
+| Validation | Migrated legacy validators | Preserve validation behaviour first; record every defect fix and its tests. |
+| Testing | Jest + current test suite | Port backend contract/controller tests with each API area. |
+| Styling | Tailwind CSS v4 and legacy visual rules | Recreate existing UI first; defer new design system work. |
+
+## 3. High-Level Request Flow
+
+```text
+Browser
+  ├── Next.js pages, layouts, Client Components and legacy-equivalent UI
+  └── same-origin fetch('/api/...', { credentials: 'include' })
+                         |
+                         v
+Next.js on Netlify
+  ├── App Router pages and protected layouts
+  ├── app/api/**/route.js endpoint adapters
+  ├── server controllers, validators, models and auth helpers
+  └── cached Mongoose connection
+                         |
+                         v
+Existing MongoDB deployment
+  ├── users
+  ├── categories
+  └── transactions
+```
+
+Same-origin deployment removes the legacy cross-origin browser call and CORS requirement. It does not remove authorization: every protected handler resolves the JWT cookie and scopes database queries to the current user.
+
+## 4. Route-Handler Pattern
+
+Route Handlers cannot use Express routers, `next()`, `cookie-parser`, `req.cookies`, `res.cookie`, or `app.listen`. Preserve controller separation with a thin adapter per endpoint:
+
+```text
+Route Handler
+  -> parse JSON/query/params into a request-shaped input
+  -> resolve authenticated user through requireCurrentUser()
+  -> call migrated controller/service
+  -> return legacy-compatible JSON, status, and cookie changes
+```
+
+Create shared helpers once for:
+
+- cached Mongoose connection;
+- JWT sign/verify and `token` cookie set/clear;
+- current-user resolution;
+- response/error mapping;
+- request validation;
+- Google credential verification;
+- ownership checks for user-owned resources.
+
+The adapter is not authorization. Controllers/services must always query user-owned records with both `_id` and `userId`.
+
+## 5. Project Structure
+
+```text
+app/
+├── (auth)/
+│   ├── login/page.js
+│   └── signup/page.js
+├── (protected)/
+│   ├── layout.js
+│   ├── dashboard/page.js
+│   ├── transactions/page.js
+│   ├── profile/page.js
+│   └── settings/page.js
+├── api/
+│   ├── auth/
+│   │   ├── signup/route.js
+│   │   ├── login/route.js
+│   │   ├── login/google/route.js
+│   │   ├── signout/route.js
+│   │   ├── me/route.js
+│   │   ├── changePreferences/route.js
+│   │   ├── profile/route.js
+│   │   └── change-password/route.js
+│   ├── categories/
+│   ├── transactions/
+│   └── analytics/dashboard/route.js
+├── globals.css
+└── layout.js
+components/                  reusable UI only
+features/                    feature UI, API client, hooks, tests
+lib/
+├── auth/                    JWT, cookie, require-current-user helpers
+├── db.js                    cached Mongoose connection
+├── google-auth.js
+├── errors.js
+└── validators/
+models/                      User, Category, Transaction Mongoose models
+server/
+├── controllers/             migrated legacy behaviour
+└── services/                shared domain operations when needed
+docs/
+__tests__/                   Jest setup and cross-feature contract tests
+```
+
+Do not introduce an Express compatibility layer merely to keep old imports unchanged.
+
+## 6. Data and Authentication Rules
+
+### Existing data
+
+The existing MongoDB database is retained. Do not rename collections, rewrite records, or alter transaction/category data as a by-product of migration.
+
+### User model change required for Google creation
+
+The legacy model requires `password`, but Google-created accounts have none. The replacement model must support password-only, Google-only, and linked accounts. Store a stable Google subject identifier separately from email and enforce its uniqueness when present.
+
+Password login rejects accounts without a password credential. A verified matching email links a Google identity to an existing account; a Google subject already linked elsewhere is rejected. This is an intentional PRD behaviour improvement and requires migration tests.
+
+Do not create a password-setup API or UX during parity work. That later feature needs explicit product and design approval.
+
+### Cookies and secrets
+
+- JWT preserves the existing user identity contract and seven-day expiry.
+- The `token` cookie remains HTTP-only and is set/cleared only in server code.
+- `MONGO_URI`, `JWT_SECRET`, Google configuration, and internal category keys are runtime secrets.
+- Configure function-runtime secrets in Netlify UI, CLI, or API. Do not rely on `netlify.toml` for function secrets or prefix a secret with `NEXT_PUBLIC_`.
+
+## 7. Netlify Deployment Rules
+
+- Let Netlify detect the Next.js app; do not add or pin a legacy Next.js runtime/plugin.
+- Use the Netlify CLI for deployment-faithful local verification; use `next dev` for UI iteration.
+- Configure MongoDB, JWT, Google, and production cookie/domain variables in Netlify environment settings.
+- Confirm MongoDB network access accepts Netlify functions before production cutover.
+- Smoke-test a deployed preview for login, cookie persistence, database access, and protected endpoints before production.
+
+## 8. Defect-Fix Policy
+
+Defect fixes must preserve endpoint paths and successful response shapes. For each fix, record:
+
+1. the legacy behaviour and why it is defective;
+2. the corrected behaviour;
+3. regression tests, including ownership/security impact where relevant.
+
+Expected migration fixes include valid zero-valued transaction updates, cookie clearing with intended attributes, and first-time Google-account creation. Do not add other behavioural changes without agreement.

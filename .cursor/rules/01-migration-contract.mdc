@@ -1,0 +1,12 @@
+---
+description: SK Ledger migration scope, JavaScript requirements, and API compatibility.
+alwaysApply: true
+---
+
+- Read `AGENTS.md`, `docs/PRD.md`, `docs/ARCHITECTURE.md`, and `docs/DEVELOPMENT_PLAN.md` before changing this repository.
+- This is a JavaScript-only Next.js migration. Do not add TypeScript, Supabase, Postgres, a new auth framework, a separate Express server, or a separate backend deployment.
+- Legacy frontend and server are the behaviour reference. Preserve API paths, methods, and successful response shapes unless the task identifies and tests a defect fix.
+- Work on one phase task at a time. Before editing, identify the legacy route/controller/model/tests and frontend components being migrated.
+- Do not redesign existing screens during parity migration. Ask before designing a screen without a legacy visual reference.
+- Do not discard user changes, alter production data, expose secrets, or add dependencies without explaining their purpose.
+- Complete work only after relevant Jest tests, lint, and build checks have run or missing verification is stated.

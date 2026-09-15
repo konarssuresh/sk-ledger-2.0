@@ -1,0 +1,13 @@
+---
+description: Next.js route handlers, MongoDB/Mongoose, authentication, and API security rules.
+globs: app/api/**/*.js,lib/**/*.js,models/**/*.js,server/**/*.js,__tests__/**/*.js
+alwaysApply: false
+---
+
+- Route Handlers replace Express routers. Do not use `app.listen`, Express middleware, `req.cookies`, `res.cookie`, CORS middleware, or Express response objects.
+- Use one cached Mongoose connection helper. Never open a database connection in a React component or independently in each handler.
+- Every protected handler verifies the HTTP-only `token` JWT and scopes database access by authenticated user ID. Layout protection is not sufficient authorization.
+- Keep legacy JSON response bodies and HTTP status behaviour for successful requests. Test any intentional error/defect change.
+- Keep existing MongoDB collection data intact. Do not rename, migrate, or bulk rewrite records unless explicitly authorized.
+- Google credential verification is server-only. New verified Google users have no password credential; matching users link by verified normalized email; Google subject IDs are unique.
+- Never return password hashes, JWT secrets, MongoDB URIs, Google credentials, or internal keys.
