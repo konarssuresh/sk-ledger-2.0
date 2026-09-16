@@ -112,6 +112,26 @@ __tests__/                   Jest setup and cross-feature contract tests
 
 Do not introduce an Express compatibility layer merely to keep old imports unchanged.
 
+### JavaScript-only boundaries
+
+- Application source uses `.js` only under `app/`, `components/`, `features/`, `lib/`, `models/`, `server/`, and `__tests__/`. Do not add TypeScript (`tsconfig`, `.ts`/`.tsx` app files, or `@types/*` for app code).
+- Next.js may emit generated types under `.next/`; do not treat those as application source.
+
+### Folder ownership and imports
+
+| Location | Allowed imports | Must not import |
+| --- | --- | --- |
+| `app/**/page.js`, `layout.js` (Server Components by default) | `components/`, `features/` server-safe modules | `mongoose`, `jsonwebtoken`, `bcrypt`, raw `process.env` secrets |
+| `app/**` with `"use client"` | Same-origin `/api` via `fetch` or feature clients; UI state | `lib/db.js`, `models/`, `server/controllers/`, JWT secrets, Google server verification |
+| `app/api/**/route.js` | `lib/*`, `models/`, `server/controllers/`, `server/services/` | React, browser APIs |
+| `lib/`, `models/`, `server/` | Node/Mongoose/JWT/Google libraries | React client hooks, `"use client"` modules |
+| `components/`, `features/` | Other UI modules, client-safe utilities | Mongoose, server controllers, env secrets |
+
+- One cached connection: only `lib/db.js` (or helpers it exports) calls `mongoose.connect`.
+- Secrets (`MONGO_URI`, `JWT_SECRET`, `INTERNAL_KEY`, Google server IDs) are read only in Route Handlers, `lib/`, `models/`, or `server/` — never in Client Components or committed files.
+
+See `docs/MIGRATION_INVENTORY.md` for per-endpoint and per-screen checklists.
+
 ## 6. Data and Authentication Rules
 
 ### Existing data

@@ -1,0 +1,6 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+# Next.js App Router and /api Route Handlers are served by Netlify's Next.js integration.
+# Do not add a separate netlify/functions tree for API routes.

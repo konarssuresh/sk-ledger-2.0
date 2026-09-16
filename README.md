@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# SK Ledger 2.0
 
-## Getting Started
+JavaScript Next.js App Router replacement for the legacy Vite frontend and Express backend. Behaviour parity, MongoDB retention, and Netlify hosting are defined in `docs/PRD.md`, `docs/ARCHITECTURE.md`, and `docs/DEVELOPMENT_PLAN.md`.
 
-First, run the development server:
+Migration checklists live in [`docs/MIGRATION_INVENTORY.md`](docs/MIGRATION_INVENTORY.md).
+
+## Prerequisites
+
+- Node.js (LTS recommended)
+- Copy `.env.example` to `.env.local` and fill in values for local server work (Phase 1+). Never commit secrets.
+
+## Development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000). Use `next dev` for UI iteration.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## Netlify-compatible local run
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Requires [Netlify CLI](https://docs.netlify.com/cli/get-started/) (included as a dev dependency):
 
-## Learn More
+```bash
+npm run netlify:dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+API routes will be served through Netlify's Next.js integration when deployed; do not add a separate `netlify/functions` tree for `/api`.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Quality checks
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm run lint
+npm run build
+npm test
+```
 
-## Deploy on Vercel
+## Agent contract
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See [`AGENTS.md`](AGENTS.md) before making changes.
