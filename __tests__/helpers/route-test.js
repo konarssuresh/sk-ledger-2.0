@@ -18,13 +18,24 @@ async function readResponse(response) {
   };
 }
 
-async function invokeRoute(handler, { method = "GET", url, body, cookies } = {}) {
-  const headers = new Headers({ "Content-Type": "application/json" });
+async function invokeRoute(
+  handler,
+  { method = "GET", url, body, cookies, headers: extraHeaders, params } = {},
+) {
+  const headers = new Headers();
+  if (method !== "GET" && method !== "DELETE") {
+    headers.set("Content-Type", "application/json");
+  }
   if (cookies) {
     headers.set(
       "cookie",
       Array.isArray(cookies) ? cookies.join("; ") : cookies,
     );
+  }
+  if (extraHeaders) {
+    Object.entries(extraHeaders).forEach(([key, value]) => {
+      headers.set(key, value);
+    });
   }
 
   const init = { method, headers };
@@ -33,7 +44,10 @@ async function invokeRoute(handler, { method = "GET", url, body, cookies } = {})
   }
 
   const request = new NextRequest(url || "http://localhost:3000/api/test", init);
-  const response = await handler(request);
+  const context = params ? { params: Promise.resolve(params) } : undefined;
+  const response = context
+    ? await handler(request, context)
+    : await handler(request);
   return readResponse(response);
 }
 

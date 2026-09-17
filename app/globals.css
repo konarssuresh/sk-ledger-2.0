@@ -214,3 +214,91 @@ html.theme-dark .google-login-visual {
   border-color: rgba(20, 184, 166, 0.95);
   color: #0d9488;
 }
+
+.calc-panel {
+  border-color: rgba(148, 163, 184, 0.45);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.calc-input {
+  border-color: rgba(148, 163, 184, 0.45);
+  background: #ffffff;
+  color: #0f172a;
+}
+
+.calc-input::placeholder {
+  color: #94a3b8;
+}
+
+html.theme-dark .calc-panel {
+  border-color: rgba(71, 85, 105, 0.7);
+  background: rgba(17, 24, 39, 0.92);
+}
+
+html.theme-dark .calc-input {
+  border-color: rgba(71, 85, 105, 0.7);
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+html.theme-dark .calc-input::placeholder {
+  color: #64748b;
+}
+
+html.theme-dark .app-dialog {
+  border-color: rgba(71, 85, 105, 0.7);
+  background: #111827;
+}
+
+html.theme-dark .app-dialog-header,
+html.theme-dark .app-dialog-footer {
+  border-color: rgba(71, 85, 105, 0.7);
+}
+
+html.theme-dark .app-dialog-title {
+  color: #e2e8f0;
+}
+
+html.theme-dark .app-dialog-body {
+  color: #cbd5e1;
+}
+
+html.theme-dark .app-dialog .text-slate-900 {
+  color: #e2e8f0;
+}
+
+html.theme-dark .app-dialog .text-slate-700,
+html.theme-dark .app-dialog .text-slate-600,
+html.theme-dark .app-dialog .text-slate-500 {
+  color: #94a3b8;
+}
+
+html.theme-dark .app-dialog .label-text {
+  color: #94a3b8;
+}
+
+html.theme-dark .app-dialog .input,
+html.theme-dark .app-dialog .select,
+html.theme-dark .app-dialog .textarea {
+  border-color: rgba(71, 85, 105, 0.7);
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+html.theme-dark .app-dialog .input::placeholder,
+html.theme-dark .app-dialog .textarea::placeholder {
+  color: #64748b;
+}
+
+html.theme-dark .app-dialog .select option {
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+@utility z-1000 {
+  z-index: 1000;
+}
+
+@utility z-1100 {
+  z-index: 1100;
+}
