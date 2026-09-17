@@ -27,7 +27,10 @@ Prepare the JavaScript scaffold without changing product behaviour.
 - Build an endpoint contract matrix from legacy routes, controllers, OpenAPI document, frontend API calls, and Jest tests.
 - Capture each legacy page's routes, states, and acceptance checks. Use the legacy frontend as visual reference; use `index.html` and `settings.html` for supplied desktop/mobile transaction/settings detail.
 - Add the JavaScript-only folder boundaries in `ARCHITECTURE.md`.
-- Add only dependencies needed to replace legacy runtime needs in Next.js: Mongoose, bcrypt, JWT, Google credential verification, and existing test tooling. Record every dependency before installation.
+- Add only dependencies needed to replace legacy runtime needs in Next.js: Mongoose, bcrypt, JWT, Google credential verification, Redux Toolkit, React Redux, TanStack React Query, and existing test tooling. Record every dependency before installation.
+- Create the root Redux Toolkit store and React Redux provider for shared client-only UI state.
+- Create the root TanStack Query client/provider for API reads, mutation lifecycle, caching, invalidation, loading, and API errors.
+- Establish the state boundary: Redux Toolkit never stores API response data; TanStack Query never owns local UI state such as dialog visibility or calendar selection.
 - Create `.env.example` with existing required variable names only.
 - Configure Netlify-compatible local verification with the Netlify CLI; do not add a separate Netlify Function directory for Next.js API routes.
 - Keep Jest configuration until each migrated test has a working Next.js-compatible home.
@@ -35,6 +38,8 @@ Prepare the JavaScript scaffold without changing product behaviour.
 ### Completion Criteria
 
 - The scaffold remains JavaScript-only and starts, lints, and builds.
+- Redux Toolkit and TanStack Query are available to Client Components through root providers.
+- No fetched API record is stored in Redux.
 - Every legacy endpoint and frontend screen has a migration checklist item.
 - No secret or database value is committed.
 
@@ -71,6 +76,7 @@ Recreate auth endpoints and pages with the same external contracts.
 - Implement every auth Route Handler named in the PRD.
 - Migrate signup, login, logout, current-user, preferences, profile, and change-password controller behaviour.
 - Recreate Login, Signup, protected-layout, and navigation behaviour from the legacy frontend.
+- Use TanStack Query for current-user reads and auth mutation lifecycle. Keep shared auth-page UI-only state in Redux only when it is genuinely shared.
 - Port Google credential verification. On first verified Google use, create a Google-only account; on verified matching email, link the existing password account; reject Google-subject conflicts.
 - Retain the legacy Google endpoint path and successful response shape while adding account-creation coverage.
 - Port current Jest controller/route tests and add Google creation/linking tests.
@@ -94,6 +100,7 @@ Recreate core ledger APIs and the transaction experience before dashboard report
 - Port controller logic and Jest tests feature by feature.
 - Explicitly test and fix legacy update defects, including valid zero-valued updates, while preserving public contracts.
 - Recreate the Transactions route, calendar, selected-day list, add/edit/delete dialogs, inline category flow, and calculator from legacy code and `index.html`.
+- Use TanStack Query for category/transaction reads and mutations. Use Redux Toolkit only for shared transaction UI state such as selected date, active dialog, or calculator visibility.
 - Maintain loading, empty, error, keyboard, mobile, and desktop states.
 
 ### Completion Criteria
@@ -113,6 +120,7 @@ Port analytics calculations and the Dashboard screen.
 - Implement `GET /api/analytics/dashboard` with legacy query parameters, periods, output fields, and ownership scope.
 - Port analytics behaviour and tests for daily, weekly, monthly, and yearly ranges.
 - Recreate dashboard summary cards, charts, insights, recent transactions, period controls, shimmers, and empty/error states from legacy frontend.
+- Use TanStack Query for dashboard data and period-query cache keys. Keep presentation-only controls in component state or Redux Toolkit when shared across dashboard UI.
 - Reconcile dashboard output against controlled transaction fixtures and document each defect correction.
 
 ### Completion Criteria
@@ -130,6 +138,7 @@ Finish account UI and verify complete legacy behaviour parity.
 
 - Recreate Profile and Settings from legacy frontend and `settings.html`.
 - Validate profile edits, currency/theme preference updates, password changes, signout, and theme persistence.
+- Use TanStack Query for persisted profile/preferences and mutations; use Redux Toolkit only for immediate shared UI state such as the active theme presentation before/refetch after persistence.
 - Verify Login, Signup, Dashboard, Transactions, Profile, and Settings against a page-by-page parity checklist at desktop and mobile widths.
 - Record each intentional defect fix with regression coverage.
 

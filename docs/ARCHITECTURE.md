@@ -17,6 +17,8 @@ This document defines implementation of the approved parity migration. `docs/PRD
 | Google sign-in | `google-auth-library` + credential-post endpoint | Verify credentials server-side; support account creation and email-based linking. |
 | Validation | Migrated legacy validators | Preserve validation behaviour first; record every defect fix and its tests. |
 | Testing | Jest + current test suite | Port backend contract/controller tests with each API area. |
+| Client state | Redux Toolkit | Store shared client-only UI and preference state. Do not use Redux as an API cache. |
+| Server state | TanStack React Query | Own API reads, mutation lifecycle, cache invalidation, loading, and error state. |
 | Styling | Tailwind CSS v4 and legacy visual rules | Recreate existing UI first; defer new design system work. |
 
 ## 3. High-Level Request Flow
@@ -42,7 +44,20 @@ Existing MongoDB deployment
 
 Same-origin deployment removes the legacy cross-origin browser call and CORS requirement. It does not remove authorization: every protected handler resolves the JWT cookie and scopes database queries to the current user.
 
-## 4. Route-Handler Pattern
+## 4. State Ownership
+
+| State | Owner |
+| --- | --- |
+| Users, categories, transactions, analytics, and profile records | MongoDB via Next.js APIs |
+| API queries, mutations, cache, invalidation, loading, and API errors | TanStack React Query |
+| Shared browser-only UI state such as open dialogs, calendar selection, and transient filters | Redux Toolkit |
+| Theme/currency preferences while editing or rendering locally | Redux Toolkit; the authenticated persisted value is refetched through TanStack Query |
+| Individual form inputs and validation feedback | Local component/form state |
+| JWT session | HTTP-only `token` cookie |
+
+Redux Toolkit must not duplicate TanStack Query data. Do not store fetched transactions, categories, dashboard results, profile records, session tokens, or API responses in Redux. After a successful mutation, invalidate or update the relevant TanStack Query cache rather than manually synchronizing a Redux copy.
+
+## 5. Route-Handler Pattern
 
 Route Handlers cannot use Express routers, `next()`, `cookie-parser`, `req.cookies`, `res.cookie`, or `app.listen`. Preserve controller separation with a thin adapter per endpoint:
 
@@ -66,7 +81,7 @@ Create shared helpers once for:
 
 The adapter is not authorization. Controllers/services must always query user-owned records with both `_id` and `userId`.
 
-## 5. Project Structure
+## 6. Project Structure
 
 ```text
 app/
@@ -96,6 +111,7 @@ app/
 └── layout.js
 components/                  reusable UI only
 features/                    feature UI, API client, hooks, tests
+store/                       Redux Toolkit store, slices, selectors
 lib/
 ├── auth/                    JWT, cookie, require-current-user helpers
 ├── db.js                    cached Mongoose connection
@@ -132,7 +148,7 @@ Do not introduce an Express compatibility layer merely to keep old imports uncha
 
 See `docs/MIGRATION_INVENTORY.md` for per-endpoint and per-screen checklists.
 
-## 6. Data and Authentication Rules
+## 7. Data and Authentication Rules
 
 ### Existing data
 
@@ -153,7 +169,7 @@ Do not create a password-setup API or UX during parity work. That later feature 
 - `MONGO_URI`, `JWT_SECRET`, Google configuration, and internal category keys are runtime secrets.
 - Configure function-runtime secrets in Netlify UI, CLI, or API. Do not rely on `netlify.toml` for function secrets or prefix a secret with `NEXT_PUBLIC_`.
 
-## 7. Netlify Deployment Rules
+## 8. Netlify Deployment Rules
 
 - Let Netlify detect the Next.js app; do not add or pin a legacy Next.js runtime/plugin.
 - Use the Netlify CLI for deployment-faithful local verification; use `next dev` for UI iteration.
@@ -161,7 +177,7 @@ Do not create a password-setup API or UX during parity work. That later feature 
 - Confirm MongoDB network access accepts Netlify functions before production cutover.
 - Smoke-test a deployed preview for login, cookie persistence, database access, and protected endpoints before production.
 
-## 8. Defect-Fix Policy
+## 9. Defect-Fix Policy
 
 Defect fixes must preserve endpoint paths and successful response shapes. For each fix, record:
 

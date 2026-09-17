@@ -25,6 +25,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - Retain the JWT in the HTTP-only `token` cookie, email/password authentication, and Google credential login.
 - Google credential login creates a new account on first verified use, links to a matching email/password account, and prevents one Google subject from belonging to two users.
 - Retain Jest and migrate the current backend tests as endpoint contracts are moved.
+- Use Redux Toolkit for shared client-only state and TanStack React Query for server state. Never duplicate API data in Redux.
 
 ## Working rules
 
@@ -38,6 +39,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 8. Preserve semantic HTML, keyboard access, visible focus, labelled controls, loading, empty, and error states while porting the legacy UI.
 9. Keep work narrowly scoped. Do not combine migration, redesign, dependency replacement, and unrelated cleanup in a single task.
 10. Run lint, build, and the relevant Jest tests before declaring a task complete; report anything not run.
+11. After a server mutation, invalidate or update the relevant TanStack Query cache. Do not manually synchronize a Redux copy of server data.
 
 ## Escalation rule
 

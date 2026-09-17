@@ -14,14 +14,14 @@ Status key: `[ ]` not started · `[~]` in progress · `[x]` complete
 
 | Status | Method | Path | Auth | Query / body | OpenAPI | Legacy controller | Legacy route | Frontend caller | Jest tests | Target Next handler |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| [ ] | POST | `/api/auth/signup` | Public | Body: `fullName`, `email`, `password`, optional `baseCurrency` | `/api/auth/signup` | `authController.signup` | `authRouter.js` | `userSlice` `signup` | `authRouter.test.js`, `authController.test.js` | `app/api/auth/signup/route.js` |
-| [ ] | POST | `/api/auth/login` | Public | Body: `email`, `password`; sets `token` cookie | `/api/auth/login` | `authController.login` | `authRouter.js` | `userSlice` `login` | same | `app/api/auth/login/route.js` |
-| [ ] | POST | `/api/auth/login/google` | Public | Body: `credential`; sets `token` cookie; PRD: create/link account | `/api/auth/login/google` | `authController.signinWithGoogle` | `authRouter.js` | `userSlice` `loginWithGoogle` | same (+ new Google create/link tests in Phase 2) | `app/api/auth/login/google/route.js` |
-| [ ] | POST | `/api/auth/signout` | Public | Clears `token` cookie | `/api/auth/signout` | `authController.signout` | `authRouter.js` | `userSlice` `signout` | same | `app/api/auth/signout/route.js` |
-| [ ] | GET | `/api/auth/me` | Cookie JWT | — | `/api/auth/me` | `authController.getCurrentUser` | `authRouter.js` + `validateUser` | `userSlice` `me` | same, `validateUser.test.js` | `app/api/auth/me/route.js` |
-| [ ] | POST | `/api/auth/changePreferences` | Cookie JWT | Body: `currency`, `theme` | `/api/auth/changePreferences` | `authController.updatePreference` | `authRouter.js` | `userSlice` `changePreferences` | same | `app/api/auth/changePreferences/route.js` |
-| [ ] | PATCH | `/api/auth/profile` | Cookie JWT | Body: `fullName`, optional `email` | `/api/auth/profile` | `authController.updateProfile` | `authRouter.js` | `userSlice` `updateProfile` | same | `app/api/auth/profile/route.js` |
-| [ ] | POST | `/api/auth/change-password` | Cookie JWT | Body: `currentPassword`, `newPassword` | `/api/auth/change-password` | `authController.changePassword` | `authRouter.js` | `userSlice` `changePassword` | same | `app/api/auth/change-password/route.js` |
+| [x] | POST | `/api/auth/signup` | Public | Body: `fullName`, `email`, `password`, optional `baseCurrency` | `/api/auth/signup` | `authController.signup` | `authRouter.js` | `userSlice` `signup` | `authRouter.test.js`, `authController.test.js` | `app/api/auth/signup/route.js` |
+| [x] | POST | `/api/auth/login` | Public | Body: `email`, `password`; sets `token` cookie | `/api/auth/login` | `authController.login` | `authRouter.js` | `userSlice` `login` | same | `app/api/auth/login/route.js` |
+| [x] | POST | `/api/auth/login/google` | Public | Body: `credential`; sets `token` cookie; PRD: create/link account | `/api/auth/login/google` | `authController.signinWithGoogle` | `authRouter.js` | `userSlice` `loginWithGoogle` | same (+ new Google create/link tests in Phase 2) | `app/api/auth/login/google/route.js` |
+| [x] | POST | `/api/auth/signout` | Public | Clears `token` cookie | `/api/auth/signout` | `authController.signout` | `authRouter.js` | `userSlice` `signout` | same | `app/api/auth/signout/route.js` |
+| [x] | GET | `/api/auth/me` | Cookie JWT | — | `/api/auth/me` | `authController.getCurrentUser` | `authRouter.js` + `validateUser` | `userSlice` `me` | same, `validateUser.test.js` | `app/api/auth/me/route.js` |
+| [x] | POST | `/api/auth/changePreferences` | Cookie JWT | Body: `currency`, `theme` | `/api/auth/changePreferences` | `authController.updatePreference` | `authRouter.js` | `userSlice` `changePreferences` | same | `app/api/auth/changePreferences/route.js` |
+| [x] | PATCH | `/api/auth/profile` | Cookie JWT | Body: `fullName`, optional `email` | `/api/auth/profile` | `authController.updateProfile` | `authRouter.js` | `userSlice` `updateProfile` | same | `app/api/auth/profile/route.js` |
+| [x] | POST | `/api/auth/change-password` | Cookie JWT | Body: `currentPassword`, `newPassword` | `/api/auth/change-password` | `authController.changePassword` | `authRouter.js` | `userSlice` `changePassword` | same | `app/api/auth/change-password/route.js` |
 | [ ] | POST | `/api/categories/create-default` | Header `x-internal-key` | — | `/api/categories/create-default` | `categoryController.createDefaultCategories` | `categoryRouter.js` + `internalAuth` | *(internal only)* | `categoryRouter.test.js`, `internalAuth.test.js`, `categoryController.test.js` | `app/api/categories/create-default/route.js` |
 | [ ] | POST | `/api/categories/create` | Cookie JWT | Body: category fields | `/api/categories/create` | `categoryController.createCategory` | `categoryRouter.js` | `categorySlice` `createCategory` | same | `app/api/categories/create/route.js` |
 | [ ] | GET | `/api/categories` | Cookie JWT | — | `/api/categories` | `categoryController.getCategories` | `categoryRouter.js` | `categorySlice` `fetchCategories` | same | `app/api/categories/route.js` |
@@ -43,14 +43,14 @@ Status key: `[ ]` not started · `[~]` in progress · `[x]` complete
 
 | Status | Next target | Legacy route | Legacy files | Acceptance checks |
 | --- | --- | --- | --- | --- |
-| [ ] | `app/(protected)/layout.js` | — | `RouteProtector.jsx`, `AuthenticatedLayout.jsx`, `AppNavigation.jsx` | `GET /api/auth/me` with credentials; loading shimmer; redirect to `/login` on error; apply user theme; desktop sidebar (collapsible) with Dashboard / Transactions / Settings; mobile bottom nav; Profile reachable but not in mobile nav items |
+| [x] | `app/(protected)/layout.js` | — | `RouteProtector.jsx`, `AuthenticatedLayout.jsx`, `AppNavigation.jsx` | Phase 2 minimal: `GET /api/auth/me` gate, loading state, redirect to `/login`; full nav deferred Phase 3–5 |
 
 ### Auth pages
 
 | Status | Next target | Legacy route | Legacy files | Acceptance checks |
 | --- | --- | --- | --- | --- |
-| [ ] | `app/(auth)/login/page.js` | `/login` | `pages/login/index.jsx` | Email/password form validation; submit calls login API; Google button posts credential; redirect to `/transactions` when session exists; auth hero styling; loading states; keyboard-accessible controls |
-| [ ] | `app/(auth)/signup/page.js` | `/signup` | `pages/signup/index.jsx` | Signup form; POST signup; redirect authenticated users away from page |
+| [x] | `app/(auth)/login/page.js` | `/login` | `pages/login/index.jsx` | Email/password form validation; submit calls login API; Google button posts credential; redirect to `/transactions` when session exists; auth hero styling; loading states; keyboard-accessible controls |
+| [x] | `app/(auth)/signup/page.js` | `/signup` | `pages/signup/index.jsx` | Signup form; POST signup; redirect authenticated users away from page |
 
 ### Protected pages
 
@@ -67,7 +67,7 @@ Status key: `[ ]` not started · `[~]` in progress · `[x]` complete
 | --- | --- | --- | --- |
 | [ ] | Unknown paths | `Navigate` to `/login` | Equivalent redirect in App Router |
 | [ ] | Post-login landing | `/transactions` | Same default |
-| [ ] | Google client ID | `VITE_GOOGLE_CLIENT_ID` in `main.jsx` | Document public env for Phase 2 (e.g. `NEXT_PUBLIC_GOOGLE_CLIENT_ID`); server verifies with `OAUTH_CLIENT` / `GOOGLE_CLIENT_ID` |
+| [x] | Google client ID | `VITE_GOOGLE_CLIENT_ID` in `main.jsx` | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` in `.env.example`; server uses `OAUTH_CLIENT` |
 
 ---
 
@@ -77,11 +77,11 @@ Port from `skledger-server` into `sk-ledger-2.0/__tests__/` as Route Handlers la
 
 | Legacy test file | Scope | Target phase |
 | --- | --- | --- |
-| `src/routes/__tests__/authRouter.test.js` | Auth HTTP contracts | 2 |
+| `src/routes/__tests__/authRouter.test.js` | Auth HTTP contracts | Done → `__tests__/auth-routes.test.js` |
 | `src/routes/__tests__/categoryRouter.test.js` | Category HTTP contracts | 3 |
 | `src/routes/__tests__/transactionRouter.test.js` | Transaction HTTP contracts | 3 |
 | `src/routes/__tests__/analyticsRouter.test.js` | Analytics HTTP contracts | 4 |
-| `src/controllers/__tests__/authController.test.js` | Auth controller logic | 2 |
+| `src/controllers/__tests__/authController.test.js` | Auth controller logic | Done → `__tests__/auth-controller.test.js` (+ `__tests__/google-auth.test.js`) |
 | `src/controllers/__tests__/categoryController.test.js` | Category controller logic | 3 |
 | `src/controllers/__tests__/transactionController.test.js` | Transaction controller logic | 3 |
 | `src/controllers/__tests__/analyticsController.test.js` | Analytics controller logic | 4 |
