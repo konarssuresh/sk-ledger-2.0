@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postbuild": "node scripts/check-client-bundle-secrets.js",
     "start": "next start",
     "lint": "eslint",
     "test": "jest --runInBand --detectOpenHandles",
