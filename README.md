@@ -34,12 +34,21 @@ Set these in the Netlify site **Environment variables** UI (production and previ
 | `MONGO_URI` | MongoDB connection string |
 | `JWT_SECRET` | Session signing secret |
 | `INTERNAL_KEY` | Protects `POST /api/categories/create-default` |
-| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | Public Web client ID (inlined in the browser bundle) |
-| `GOOGLE_CLIENT_ID` | Same Web client ID for server Google token verification |
+| `NEXT_PUBLIC_GOOGLE_CLIENT_ID` | Public Web client ID (browser + server Google verification via `lib/google-auth.js` fallback) |
 
-Do **not** set `OAUTH_CLIENT` on Netlify if it duplicates `NEXT_PUBLIC_GOOGLE_CLIENT_ID` — Netlify secrets scanning treats that as a leak in client JS. Remove `OAUTH_CLIENT` from Netlify if present.
+**Remove from Netlify if present** (they break secrets scanning or are legacy Express-only):
 
-[`netlify.toml`](netlify.toml) sets `SECRETS_SCAN_OMIT_PATHS` for server-only build output where runtime env (e.g. `INTERNAL_KEY`) is expected in the Netlify handler bundle.
+| Variable | Why |
+| --- | --- |
+| `GOOGLE_CLIENT_ID` | Same value as `NEXT_PUBLIC_*` is inlined in client JS — scanner flags it as a leaked secret |
+| `OAUTH_CLIENT` | Same false positive as above |
+| `PORT` | Legacy Express (`skledger-server`); not used by Next on Netlify |
+
+**Scopes (important):** In Netlify, set `MONGO_URI`, `JWT_SECRET`, and `INTERNAL_KEY` for **Functions** (and/or **Runtime**) only — **not** for **Build**, unless required. When those secrets are present during `npm run build`, the Next/Netlify adapter can embed them in server build artifacts; [`netlify.toml`](netlify.toml) excludes those paths from scanning, but runtime-only scoping avoids baking secrets into build output at all.
+
+Locally you may still set optional `GOOGLE_CLIENT_ID` or `OAUTH_CLIENT` in `.env.local` (same Web client ID). Do not duplicate those names on Netlify when `NEXT_PUBLIC_GOOGLE_CLIENT_ID` is set.
+
+[`netlify.toml`](netlify.toml) sets `SECRETS_SCAN_OMIT_PATHS` for server build output and `SECRETS_SCAN_OMIT_KEYS` for `PORT` and `NEXT_PUBLIC_GOOGLE_CLIENT_ID` (the Google Web client ID is public and is inlined into client bundles by design).
 
 After deploy, smoke-test login, Google sign-in, protected routes, and logout. See Phase 8 in `docs/DEVELOPMENT_PLAN.md`.
 
