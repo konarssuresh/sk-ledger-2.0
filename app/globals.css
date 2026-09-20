@@ -1,6 +1,8 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
-@plugin "daisyui";
+@plugin "daisyui" {
+  themes: light --default;
+}
 
 @plugin "daisyui/theme" {
   name: "light";
@@ -67,6 +69,17 @@ body {
       rgba(15, 23, 42, 0) 70%
     ),
     linear-gradient(135deg, #eefcff 0%, #e0f2fe 45%, #f0fdfa 100%);
+}
+
+html:not(.theme-dark) {
+  --color-base-100: #ffffff;
+  --color-base-200: #f8fafc;
+  --color-base-300: #e2e8f0;
+  --color-base-content: #0f172a;
+  --color-neutral: #1e293b;
+  --color-neutral-content: #f8fafc;
+  --color-primary: #14b8a6;
+  --color-primary-content: #ffffff;
 }
 
 html.theme-dark body {

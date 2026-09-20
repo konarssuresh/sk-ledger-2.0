@@ -57,6 +57,8 @@ The first release is a behaviour-parity migration. The legacy frontend is the vi
 - Preserve transaction create, read, update, delete, day query, monthly summary, and single-transaction behaviour.
 - Preserve the income, expense, and savings transaction types and existing stored fields.
 - Recreate the transactions calendar/list UI, add/edit/delete flows, inline category entry, and calculator behaviour from the legacy frontend and supplied design.
+- Selecting a transaction in the selected-day list opens its legacy-equivalent bottom action sheet. It displays the transaction's category, type, signed amount, date, currency, created time, and note when present, and offers Edit and Delete actions.
+- Edit opens the existing transaction form populated with that transaction. Delete opens a separate confirmation step before the record is removed.
 
 ### Dashboard and analytics
 
@@ -91,5 +93,7 @@ The migration release is complete when:
 - Email/password and Google sign-in establish the same HTTP-only application session.
 - Google sign-in creates first-time users and links matching password accounts without duplicates.
 - A user cannot read, update, or delete another user's categories or transactions.
+- A selected-day transaction can be opened, edited, or deleted through the action sheet; the selected-day list, month summary, calendar, and affected totals refresh afterward.
+- Route navigation to every authenticated screen presents an accessible, page-shaped loading fallback while its server-rendered page is pending.
 - Defect fixes are documented and do not intentionally break public API contracts.
 - Lint, production build, and relevant migrated tests pass before deployment.

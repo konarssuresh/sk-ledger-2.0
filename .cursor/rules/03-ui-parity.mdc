@@ -8,6 +8,8 @@ alwaysApply: false
 - Prefer Server Components for routes/layouts. Add `use client` only for browser events, forms, dialogs, charts, calendar controls, or client state.
 - Client code calls same-origin `/api` endpoints with credentials included; it must not import Mongoose, JWT, server secrets, or Google verification.
 - Use TanStack React Query for API reads, mutations, caching, invalidation, loading, and API error state. Use Redux Toolkit only for shared browser UI state; never put API response data, session tokens, transactions, categories, analytics, or profile records in Redux.
+- The selected-day transaction action sheet is a required parity flow: selecting a row opens details from the bottom with Edit and Delete. Keep the selected transaction identifier/action-sheet state in Redux; obtain records and mutation results through TanStack Query.
 - Recreate loading, empty, error, theme, keyboard, and mobile behaviour with happy paths.
+- Use App Router `loading.js` route boundaries for page-navigation feedback. Match each destination page with accessible skeletons; keep route-level loading separate from TanStack Query's API loading states and never use Redux for either API or route-loading state.
 - Use semantic controls, associated labels, visible keyboard focus, keyboard-operable dialogs, and non-colour-only status indicators.
 - Do not introduce a redesigned component system during migration. Extract a reusable component only when legacy behaviour is genuinely shared.

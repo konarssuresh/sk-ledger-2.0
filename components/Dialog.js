@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import clsx from "clsx";
 import { AnimatePresence, motion as Motion } from "motion/react";
+import { acquireBodyScrollLock } from "@/lib/bodyScrollLock";
 
 const WIDTH_CLASS_MAP = {
   small: "max-w-sm",
@@ -51,8 +52,7 @@ export default function Dialog({
 
     onOpen?.();
     lastFocusedRef.current = document.activeElement;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const releaseBodyScrollLock = acquireBodyScrollLock();
 
     const setInitialFocus = () => {
       const panel = panelRef.current;
@@ -111,7 +111,7 @@ export default function Dialog({
 
     return () => {
       window.clearTimeout(timer);
-      document.body.style.overflow = previousOverflow;
+      releaseBodyScrollLock();
       document.removeEventListener("keydown", onKeyDown);
       if (
         lastFocusedRef.current &&

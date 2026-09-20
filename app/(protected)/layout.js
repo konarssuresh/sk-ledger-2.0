@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useMeQuery } from "@/features/auth/hooks";
+import ThemeSyncFromUser from "@/features/auth/ThemeSyncFromUser";
 import AppNavigation from "@/components/layout/AppNavigation";
 import DialogContainer from "@/components/DialogContainer";
 
@@ -38,6 +39,7 @@ export default function ProtectedLayout({ children }) {
 
   return (
     <div className="min-h-screen">
+      <ThemeSyncFromUser />
       <DialogContainer />
       <AppNavigation
         desktopCollapsed={desktopNavCollapsed}

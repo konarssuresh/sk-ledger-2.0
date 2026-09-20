@@ -50,7 +50,7 @@ Same-origin deployment removes the legacy cross-origin browser call and CORS req
 | --- | --- |
 | Users, categories, transactions, analytics, and profile records | MongoDB via Next.js APIs |
 | API queries, mutations, cache, invalidation, loading, and API errors | TanStack React Query |
-| Shared browser-only UI state such as open dialogs, calendar selection, and transient filters | Redux Toolkit |
+| Shared browser-only UI state such as open dialogs, calendar/transaction selection, action-sheet visibility, and transient filters | Redux Toolkit |
 | Theme/currency preferences while editing or rendering locally | Redux Toolkit; the authenticated persisted value is refetched through TanStack Query |
 | Individual form inputs and validation feedback | Local component/form state |
 | JWT session | HTTP-only `token` cookie |
@@ -81,6 +81,12 @@ Create shared helpers once for:
 
 The adapter is not authorization. Controllers/services must always query user-owned records with both `_id` and `userId`.
 
+### Route-level loading pattern
+
+Use App Router `loading.js` files for route navigation/loading boundaries. They are distinct from TanStack Query loading states: `loading.js` provides immediate page-shaped feedback while a route's server-rendered content is pending; TanStack Query represents API state inside interactive Client Components after the route is available.
+
+Each protected route receives a focused fallback matching its final layout rather than a generic spinner. Reuse a shared animated page-fallback wrapper and focused skeleton components where the visual structure is shared. Skeleton-only decoration is hidden from assistive technology; expose a concise loading status to screen readers.
+
 ## 6. Project Structure
 
 ```text
@@ -90,10 +96,18 @@ app/
 │   └── signup/page.js
 ├── (protected)/
 │   ├── layout.js
-│   ├── dashboard/page.js
-│   ├── transactions/page.js
-│   ├── profile/page.js
-│   └── settings/page.js
+│   ├── dashboard/
+│   │   ├── page.js
+│   │   └── loading.js
+│   ├── transactions/
+│   │   ├── page.js
+│   │   └── loading.js
+│   ├── profile/
+│   │   ├── page.js
+│   │   └── loading.js
+│   └── settings/
+│       ├── page.js
+│       └── loading.js
 ├── api/
 │   ├── auth/
 │   │   ├── signup/route.js
@@ -109,7 +123,8 @@ app/
 │   └── analytics/dashboard/route.js
 ├── globals.css
 └── layout.js
-components/                  reusable UI only
+components/
+└── shared/                  reusable UI, page fallback and common loading primitives
 features/                    feature UI, API client, hooks, tests
 store/                       Redux Toolkit store, slices, selectors
 lib/

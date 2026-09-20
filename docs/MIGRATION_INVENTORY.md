@@ -33,7 +33,7 @@ Status key: `[ ]` not started · `[~]` in progress · `[x]` complete
 | [x] | GET | `/api/transactions/:id` | Cookie JWT | — | `/api/transactions/{id}` | `transactionController.getTransactionById` | `transactionRouter.js` | *(indirect via mutations)* | same | `app/api/transactions/[id]/route.js` |
 | [x] | PATCH | `/api/transactions/:id` | Cookie JWT | Body: patch fields; defect: allow zero values | `/api/transactions/{id}` | `transactionController.updateTransaction` | `transactionRouter.js` | `updateTransaction` | same | `app/api/transactions/[id]/route.js` |
 | [x] | DELETE | `/api/transactions/:id` | Cookie JWT | — | `/api/transactions/{id}` | `transactionController.deleteTransaction` | `transactionRouter.js` | `deleteTransaction` | same | `app/api/transactions/[id]/route.js` |
-| [ ] | GET | `/api/analytics/dashboard` | Cookie JWT | `periodType`, `date` | `/api/analytics/dashboard` | `analyticsController.getDashboardAnalytics` | `analyticsRouter.js` | `analyticsSlice` `fetchDashboardAnalytics` | `analyticsRouter.test.js`, `analyticsController.test.js` | `app/api/analytics/dashboard/route.js` |
+| [x] | GET | `/api/analytics/dashboard` | Cookie JWT | `periodType`, `date` | `/api/analytics/dashboard` | `analyticsController.getDashboardAnalytics` | `analyticsRouter.js` | `analyticsSlice` `fetchDashboardAnalytics` | `analyticsRouter.test.js`, `analyticsController.test.js` | `app/api/analytics/dashboard/route.js` |
 
 ---
 
@@ -56,17 +56,17 @@ Status key: `[ ]` not started · `[~]` in progress · `[x]` complete
 
 | Status | Next target | Legacy route | Legacy files | Design reference | Acceptance checks |
 | --- | --- | --- | --- | --- | --- |
-| [ ] | `app/(protected)/dashboard/page.js` | `/dashboard` | `pages/dashboard/index.jsx`, `DashboardHeader.jsx`, `SummaryCards.jsx`, `ChartsSection.jsx`, `InsightsSection.jsx`, `DashboardShimmer.jsx` | — | Period type chips and prev/next; `GET /api/analytics/dashboard`; summary cards; pie/bar charts; insights; recent transactions; shimmer while loading; error state |
+| [x] | `app/(protected)/dashboard/page.js` | `/dashboard` | `pages/dashboard/index.jsx`, `DashboardHeader.jsx`, `SummaryCards.jsx`, `ChartsSection.jsx`, `InsightsSection.jsx`, `DashboardShimmer.jsx` | — | Period type chips and prev/next; `GET /api/analytics/dashboard`; summary cards; pie/bar charts; insights; recent transactions; shimmer while loading; error state |
 | [x] | `app/(protected)/transactions/page.js` | `/transactions` | `pages/transactions/index.jsx`, `Calendar.jsx`, `DayTransactions.jsx`, `AddTransactionDialog.jsx`, `DeleteTransactionDialog.jsx`, `AddCategoryInlineDialog.jsx`, `CalculatorDialog.jsx`, `TransactionsShimmer.jsx`, `common-components/Calculator.jsx` | `../../index.html` | Month navigation; `month-summary` totals; calendar day balances; selected day list via `?date=`; add/edit/delete transactions; inline category create; calculator in amount flow; loading/empty states; desktop and mobile layout |
-| [ ] | `app/(protected)/profile/page.js` | `/profile` | `pages/profile/index.jsx`, `AccountDetails.jsx`, `SecurityInfo.jsx`, `ProfileActions.jsx`, `EditProfileDialog.jsx`, `ChangePasswordDialog.jsx`, `UpdateCurrencyDialog.jsx`, `SwitchThemeDialog.jsx`, `ProfileShimmer.jsx` | — | Load user via `me`; account and security sections; edit profile PATCH; change password; currency/theme dialogs; error banner on load failure |
-| [ ] | `app/(protected)/settings/page.js` | `/settings` | `pages/settings/index.jsx` (reuses profile dialogs) | `../../settings.html` | Theme toggle persists via `changePreferences`; currency selection; change password entry; signout clears session and navigates to login; responsive desktop/mobile per supplied HTML |
+| [x] | `app/(protected)/profile/page.js` | `/profile` | `pages/profile/index.jsx`, `AccountDetails.jsx`, `SecurityInfo.jsx`, `ProfileActions.jsx`, `EditProfileDialog.jsx`, `ChangePasswordDialog.jsx`, `UpdateCurrencyDialog.jsx`, `SwitchThemeDialog.jsx`, `ProfileShimmer.jsx` | — | Load user via `me`; account and security sections; edit profile PATCH; change password; currency/theme dialogs; error banner on load failure |
+| [x] | `app/(protected)/settings/page.js` | `/settings` | `pages/settings/index.jsx` (reuses profile dialogs) | `../../settings.html` | Theme toggle persists via `changePreferences`; currency selection; change password entry; signout clears session and navigates to login; responsive desktop/mobile per supplied HTML |
 
 ### Routing parity
 
 | Status | Behaviour | Legacy | Next |
 | --- | --- | --- | --- |
-| [ ] | Unknown paths | `Navigate` to `/login` | Equivalent redirect in App Router |
-| [ ] | Post-login landing | `/transactions` | Same default |
+| [x] | Unknown paths | `Navigate` to `/login` | `app/not-found.js` → `/login` |
+| [x] | Post-login landing | `/transactions` | Same default (`LoginForm`, auth redirect) |
 | [x] | Google client ID | `VITE_GOOGLE_CLIENT_ID` in `main.jsx` | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` in `.env.example`; server uses `OAUTH_CLIENT` |
 
 ---

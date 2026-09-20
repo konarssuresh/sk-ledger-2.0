@@ -1,10 +1,13 @@
 "use client";
 
 import { useEffect } from "react";
+import { useSelector } from "react-redux";
 import { Provider } from "react-redux";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { store } from "@/store";
+import { themeSelector } from "@/store/userPreferenceSlice";
+import { applyDocumentTheme } from "@/lib/applyDocumentTheme";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -16,14 +19,11 @@ const queryClient = new QueryClient({
 });
 
 function ThemeSync({ children }) {
+  const theme = useSelector(themeSelector);
+
   useEffect(() => {
-    const root = document.documentElement;
-    const theme =
-      window.localStorage.getItem("skledger-theme") === "dark"
-        ? "dark"
-        : "light";
-    root.classList.toggle("theme-dark", theme === "dark");
-  }, []);
+    applyDocumentTheme(theme);
+  }, [theme]);
 
   return children;
 }

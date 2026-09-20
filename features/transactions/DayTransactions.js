@@ -1,18 +1,24 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { createPortal } from "react-dom";
-import { useSelector } from "react-redux";
-import { AnimatePresence, motion as Motion } from "motion/react";
-import { FormButton } from "@/components";
+import { useEffect, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { AnimatePresence } from "motion/react";
 import { mountDialog } from "./dialog-utils";
 import AddTransactionDialog from "./AddTransactionDialog";
 import DeleteTransactionDialog from "./DeleteTransactionDialog";
+import TransactionActionSheet from "./TransactionActionSheet";
 import { useCategoriesQuery } from "@/features/categories/hooks";
 import { useDayTransactionsQuery } from "@/features/transactions/hooks";
 import { calendarSelectors } from "@/store/calendarSlice";
+import {
+  closeTransactionActionSheet,
+  openTransactionActionSheet,
+  transactionUiSelectors,
+} from "@/store/transactionUiSlice";
 
 const { selectedDayKeySelector } = calendarSelectors;
+const { selectedTransactionIdSelector, isActionSheetOpenSelector } =
+  transactionUiSelectors;
 
 const amountClassByType = {
   income: "text-success",
@@ -52,131 +58,16 @@ const formatDateLabel = (dateKey) => {
   });
 };
 
-const TransactionActionSheet = ({
-  transaction,
-  category,
-  displayDate,
-  onClose,
-  onEdit,
-  onDelete,
-}) => {
-  const amountClass =
-    amountClassByType[transaction?.type] || "text-base-content";
-  const sign = signByType[transaction?.type] || "";
-  const transactionDate = formatDateLabel(
-    transaction?.date?.split?.("T")?.[0] || "",
-  );
-  const createdAt = transaction?.createdAt
-    ? new Date(transaction.createdAt).toLocaleString("en-IN", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    : "-";
-
-  return createPortal(
-    <Motion.div
-      className="fixed inset-0 z-1100 flex items-end bg-slate-900/40"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.2, ease: "easeOut" }}
-      onMouseDown={(event) => {
-        if (event.target === event.currentTarget) onClose();
-      }}
-    >
-      <Motion.div
-        className="w-full rounded-t-3xl border border-base-300 bg-base-100 px-4 pb-5 pt-4 shadow-2xl md:mx-auto md:mb-4 md:max-w-md md:rounded-2xl"
-        initial={{ y: "100%", opacity: 0.95 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: "100%", opacity: 0.95 }}
-        transition={{
-          type: "spring",
-          stiffness: 320,
-          damping: 32,
-          mass: 0.8,
-        }}
-      >
-        <div className="mx-auto mb-3 h-1.5 w-12 rounded-full bg-base-300" />
-        <div className="text-sm font-semibold text-base-content">
-          {displayDate}
-        </div>
-
-        <div className="mt-3 rounded-xl border border-base-300 bg-base-100 p-3">
-          <div className="flex items-center justify-between gap-2">
-            <div className="text-base font-semibold text-base-content">
-              {transaction.name}
-            </div>
-            <div className="rounded-full border border-base-300 px-2 py-0.5 text-[11px] font-medium text-base-content/70">
-              {toTitleCase(transaction.type)}
-            </div>
-          </div>
-          <div className="text-sm text-base-content/65">
-            {category?.emoji ? `${category.emoji} ` : ""}
-            {category?.name || "Unknown category"}
-          </div>
-          <div className={`mt-2 text-lg font-bold ${amountClass}`}>
-            {sign} {formatAmount(transaction.amount, transaction.currency)}
-          </div>
-          <div className="mt-3 grid gap-1.5 text-xs text-base-content/70">
-            <div>
-              <span className="font-medium text-base-content/80">Date:</span>{" "}
-              {transactionDate || displayDate}
-            </div>
-            <div>
-              <span className="font-medium text-base-content/80">
-                Currency:
-              </span>
-              {transaction.currency || "INR"}
-            </div>
-            <div>
-              <span className="font-medium text-base-content/80">Created:</span>{" "}
-              {createdAt}
-            </div>
-            {transaction.note ? (
-              <div>
-                <span className="font-medium text-base-content/80">Note:</span>{" "}
-                {transaction.note}
-              </div>
-            ) : null}
-          </div>
-        </div>
-
-        <div className="my-4 h-px bg-base-300" />
-
-        <div className="grid gap-2">
-          <FormButton type="button" variant="outline" onClick={onEdit}>
-            Edit
-          </FormButton>
-          <FormButton
-            type="button"
-            className="border-red-200 bg-red-500 text-white hover:bg-red-600"
-            onClick={onDelete}
-          >
-            Delete
-          </FormButton>
-        </div>
-      </Motion.div>
-    </Motion.div>,
-    document.body,
-  );
-};
-
 const DayTransactions = () => {
+  const dispatch = useDispatch();
   const selectedDay = useSelector(selectedDayKeySelector);
-  const [selectedTransaction, setSelectedTransaction] = useState(null);
-
+  const selectedTransactionId = useSelector(selectedTransactionIdSelector);
+  const isActionSheetOpen = useSelector(isActionSheetOpenSelector);
   const { data: { categories = [] } = {}, isLoading: isLoadingCategories } =
-    useCategoriesQuery(undefined, {
-      refetchOnReconnect: true,
-    });
+    useCategoriesQuery();
 
   const { data: { transactions = [] } = {}, isLoading: isLoadingTransactions } =
-    useDayTransactionsQuery({
-      date: selectedDay,
-    });
+    useDayTransactionsQuery(selectedDay);
 
   const categoryMap = useMemo(() => {
     return categories.reduce((acc, category) => {
@@ -190,7 +81,33 @@ const DayTransactions = () => {
     [selectedDay],
   );
 
+  const selectedTransaction = useMemo(() => {
+    if (!selectedTransactionId) return null;
+    return transactions.find(
+      (t) => String(t._id) === String(selectedTransactionId),
+    );
+  }, [transactions, selectedTransactionId]);
+
+  useEffect(() => {
+    if (isActionSheetOpen && selectedTransactionId && !selectedTransaction) {
+      dispatch(closeTransactionActionSheet());
+    }
+  }, [
+    dispatch,
+    isActionSheetOpen,
+    selectedTransaction,
+    selectedTransactionId,
+  ]);
+
   const isLoading = isLoadingCategories || isLoadingTransactions;
+
+  const handleOpenRow = (transaction) => {
+    dispatch(openTransactionActionSheet(transaction._id));
+  };
+
+  const handleCloseSheet = () => {
+    dispatch(closeTransactionActionSheet());
+  };
 
   const openEditDialog = (transaction) => {
     mountDialog((close) => (
@@ -200,12 +117,22 @@ const DayTransactions = () => {
 
   const openDeleteConfirm = (transaction) => {
     mountDialog((close) => (
-      <DeleteTransactionDialog
-        transaction={transaction}
-        onClose={close}
-        onDeleted={() => setSelectedTransaction(null)}
-      />
+      <DeleteTransactionDialog transaction={transaction} onClose={close} />
     ));
+  };
+
+  const handleEdit = () => {
+    if (!selectedTransaction) return;
+    const transaction = selectedTransaction;
+    handleCloseSheet();
+    openEditDialog(transaction);
+  };
+
+  const handleDelete = () => {
+    if (!selectedTransaction) return;
+    const transaction = selectedTransaction;
+    handleCloseSheet();
+    openDeleteConfirm(transaction);
   };
 
   return (
@@ -238,7 +165,7 @@ const DayTransactions = () => {
                 <button
                   key={transaction._id}
                   type="button"
-                  onClick={() => setSelectedTransaction(transaction)}
+                  onClick={() => handleOpenRow(transaction)}
                   className="flex items-center justify-between rounded-xl border border-base-300 bg-base-100 px-3 py-2 text-left transition hover:border-primary/40"
                 >
                   <div>
@@ -262,20 +189,14 @@ const DayTransactions = () => {
       </div>
 
       <AnimatePresence>
-        {selectedTransaction ? (
+        {isActionSheetOpen && selectedTransaction ? (
           <TransactionActionSheet
             transaction={selectedTransaction}
             category={categoryMap[String(selectedTransaction.categoryId)]}
             displayDate={displayDate}
-            onClose={() => setSelectedTransaction(null)}
-            onEdit={() => {
-              openEditDialog(selectedTransaction);
-              setSelectedTransaction(null);
-            }}
-            onDelete={() => {
-              setSelectedTransaction(null);
-              openDeleteConfirm(selectedTransaction);
-            }}
+            onClose={handleCloseSheet}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
           />
         ) : null}
       </AnimatePresence>

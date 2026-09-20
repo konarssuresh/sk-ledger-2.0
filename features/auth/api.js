@@ -58,4 +58,34 @@ export async function signoutRequest() {
   return parseResponse(response);
 }
 
+export async function updateProfileRequest(body) {
+  const response = await fetch("/api/auth/profile", {
+    method: "PATCH",
+    credentials: "include",
+    headers: jsonHeaders,
+    body: JSON.stringify(body),
+  });
+  return parseResponse(response);
+}
+
+export async function changePreferencesRequest(body) {
+  const response = await fetch("/api/auth/changePreferences", {
+    method: "POST",
+    credentials: "include",
+    headers: jsonHeaders,
+    body: JSON.stringify(body),
+  });
+  return parseResponse(response);
+}
+
+export async function changePasswordRequest(body) {
+  const response = await fetch("/api/auth/change-password", {
+    method: "POST",
+    credentials: "include",
+    headers: jsonHeaders,
+    body: JSON.stringify(body),
+  });
+  return parseResponse(response);
+}
+
 export const meQueryKey = ["me"];

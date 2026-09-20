@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useForm, Controller, useWatch } from "react-hook-form";
 import { useSelector } from "react-redux";
 import {
@@ -53,7 +53,10 @@ const getDefaultValues = ({ transaction = null, selectedDay } = {}) => {
 };
 
 function AddTransactionDialog({ onClose, transaction }) {
+  const [saveError, setSaveError] = useState("");
   const selectedDay = useSelector(selectedDayKeySelector);
+  const originalDate =
+    transaction?.date?.split?.("T")?.[0] || transaction?.date || null;
   const { data: { categories = [] } = {}, isLoading: isFetchingCategories } =
     useCategoriesQuery();
   const {
@@ -133,14 +136,21 @@ function AddTransactionDialog({ onClose, transaction }) {
     };
 
     try {
+      setSaveError("");
       if (id) {
-        await updateTransaction({ id, ...reqBody });
+        await updateTransaction({
+          id,
+          ...reqBody,
+          previousDate: originalDate,
+        });
       } else {
         await addTransaction(reqBody);
       }
       onClose();
     } catch (error) {
-      console.error("Failed to save transaction:", error);
+      setSaveError(
+        error?.message || "Failed to save transaction. Please try again.",
+      );
     }
   };
 
@@ -163,6 +173,7 @@ function AddTransactionDialog({ onClose, transaction }) {
           <FormButton
             fullWidth={false}
             onClick={handleSubmit}
+            loading={isAddingTransaction || isUpdatingTransaction}
             disabled={
               !formState?.isValid ||
               isAddingTransaction ||
@@ -175,6 +186,11 @@ function AddTransactionDialog({ onClose, transaction }) {
         </div>
       }
     >
+      {saveError ? (
+        <p className="mb-3 text-sm text-error" role="alert">
+          {saveError}
+        </p>
+      ) : null}
       <form
         className="grid gap-4 md:grid-cols-2"
         onSubmit={(event) => event.preventDefault()}

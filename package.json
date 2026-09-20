@@ -25,6 +25,7 @@
     "react-dom": "19.2.8",
     "react-hook-form": "^7.71.1",
     "react-redux": "^9.2.0",
+    "recharts": "^3.10.1",
     "validator": "^13.15.35"
   },
   "devDependencies": {

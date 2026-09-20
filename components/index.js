@@ -6,3 +6,8 @@ export { default as TextArea } from "./TextArea";
 export { default as Calculator } from "./Calculator";
 export { default as Dialog } from "./Dialog";
 export { default as SegmentedTypeControl } from "./SegmentedTypeControl";
+export { default as FilterChips } from "./FilterChips";
+export { default as PeriodCarousel } from "./PeriodCarousel";
+export { default as StatCard } from "./StatCard";
+export { default as PieChartCard } from "./PieChartCard";
+export { default as BarChartCard } from "./BarChartCard";

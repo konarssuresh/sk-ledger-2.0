@@ -1,9 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import { Dialog, FormButton } from "@/components";
 import { useDeleteTransactionMutation } from "@/features/transactions/hooks";
 
 const DeleteTransactionDialog = ({ onClose, transaction, onDeleted }) => {
+  const [deleteError, setDeleteError] = useState("");
   const { mutateAsync: deleteTransaction, isPending: isLoading } =
     useDeleteTransactionMutation();
 
@@ -24,12 +26,20 @@ const DeleteTransactionDialog = ({ onClose, transaction, onDeleted }) => {
             className="border-red-200 bg-red-500 text-white hover:bg-red-600"
             onClick={async () => {
               if (!transaction?._id) return;
-              await deleteTransaction({
-                id: transaction._id,
-                date: transaction.date,
-              });
-              onClose?.();
-              onDeleted?.();
+              try {
+                setDeleteError("");
+                await deleteTransaction({
+                  id: transaction._id,
+                  date: transaction.date,
+                });
+                onClose?.();
+                onDeleted?.();
+              } catch (error) {
+                setDeleteError(
+                  error?.message ||
+                    "Failed to delete transaction. Please try again.",
+                );
+              }
             }}
           >
             Delete
@@ -38,6 +48,11 @@ const DeleteTransactionDialog = ({ onClose, transaction, onDeleted }) => {
       }
     >
       <p className="text-sm text-base-content/70">This action cannot be undone.</p>
+      {deleteError ? (
+        <p className="mt-2 text-sm text-error" role="alert">
+          {deleteError}
+        </p>
+      ) : null}
     </Dialog>
   );
 };

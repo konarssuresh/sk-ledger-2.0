@@ -6,6 +6,7 @@ import {
   deleteTransactionRequest,
   fetchMonthlySummaryRequest,
   fetchTransactionsForDayRequest,
+  dayTransactionsKey,
   keysForTransactionDate,
   monthSummaryKey,
   updateTransactionRequest,
@@ -20,7 +21,7 @@ export function useMonthlySummaryQuery({ year, month }) {
 
 export function useDayTransactionsQuery(dateKey) {
   return useQuery({
-    queryKey: ["transactions", "day", dateKey],
+    queryKey: dayTransactionsKey(dateKey),
     queryFn: () => fetchTransactionsForDayRequest(dateKey),
     enabled: Boolean(dateKey),
   });
@@ -33,6 +34,17 @@ function invalidateTransactionCaches(queryClient, dateValue) {
   }
   if (day) {
     queryClient.invalidateQueries({ queryKey: day });
+  }
+  queryClient.invalidateQueries({ queryKey: ["analytics", "dashboard"] });
+}
+
+function invalidateTransactionCachesForMutation(queryClient, variables) {
+  invalidateTransactionCaches(queryClient, variables?.date);
+  if (
+    variables?.previousDate &&
+    variables.previousDate !== variables.date
+  ) {
+    invalidateTransactionCaches(queryClient, variables.previousDate);
   }
 }
 
@@ -49,9 +61,10 @@ export function useCreateTransactionMutation() {
 export function useUpdateTransactionMutation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: updateTransactionRequest,
+    mutationFn: ({ previousDate: _previousDate, ...payload }) =>
+      updateTransactionRequest(payload),
     onSuccess: (_data, variables) => {
-      invalidateTransactionCaches(queryClient, variables.date);
+      invalidateTransactionCachesForMutation(queryClient, variables);
     },
   });
 }

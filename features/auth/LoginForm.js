@@ -31,10 +31,6 @@ export default function LoginForm() {
     }
   }, [meData?.user?.id, router]);
 
-  useEffect(() => {
-    document.documentElement.classList.toggle("theme-dark", theme === "dark");
-  }, [theme]);
-
   const { control, getValues, formState } = useForm({
     mode: "all",
     defaultValues: {
