@@ -1,5 +1,8 @@
+import { PageLoadingStatus } from "@/components/shared/page-loading-status";
+
 export default function DashboardShimmer() {
   return (
+    <PageLoadingStatus label="Loading dashboard">
     <main className="min-h-screen p-2 sm:p-3 md:p-10">
       <section className="mx-auto w-full max-w-6xl rounded-3xl border border-base-300 bg-base-100 p-3 shadow-sm sm:p-4 md:p-6">
         <div className="mb-3">
@@ -62,5 +65,6 @@ export default function DashboardShimmer() {
         </section>
       </section>
     </main>
+    </PageLoadingStatus>
   );
 }

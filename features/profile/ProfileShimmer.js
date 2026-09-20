@@ -1,5 +1,8 @@
+import { PageLoadingStatus } from "@/components/shared/page-loading-status";
+
 export default function ProfileShimmer() {
   return (
+    <PageLoadingStatus label="Loading profile">
     <main className="min-h-screen p-2 sm:p-3 md:p-10">
       <section className="mx-auto w-full max-w-6xl">
         <div className="skeleton h-3 w-16 rounded" />
@@ -42,5 +45,6 @@ export default function ProfileShimmer() {
         </section>
       </section>
     </main>
+    </PageLoadingStatus>
   );
 }

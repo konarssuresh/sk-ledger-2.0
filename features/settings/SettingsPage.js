@@ -11,13 +11,14 @@ import {
   useSignoutMutation,
 } from "@/features/auth/hooks";
 import { setTheme, themeSelector } from "@/store/userPreferenceSlice";
+import SettingsShimmer from "./SettingsShimmer";
 
 export default function SettingsPage() {
   const router = useRouter();
   const dispatch = useDispatch();
   const theme = useSelector(themeSelector);
 
-  const { data } = useMeQuery({
+  const { data, isLoading } = useMeQuery({
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
   });
@@ -58,6 +59,10 @@ export default function SettingsPage() {
       />,
     );
   };
+
+  if (isLoading && !data?.user) {
+    return <SettingsShimmer />;
+  }
 
   return (
     <main className="min-h-screen p-2 sm:p-3 md:p-10">

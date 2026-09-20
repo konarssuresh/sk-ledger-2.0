@@ -72,9 +72,20 @@ Status key: **Pass** = behaviour matches legacy contract; **N/A** = not applicab
 | Post-login landing `/transactions` | Pass |
 | TanStack Query owns `me` and mutations; Redux owns theme UI only | Pass |
 
-## Remaining gaps (non–Phase 6)
+## Phase 7 — Route loading fallbacks
+
+| Check | Status |
+| --- | --- |
+| `loading.js` on Dashboard, Transactions, Profile, Settings | Pass |
+| Page-shaped skeletons (not generic full-page spinner) | Pass |
+| Skeleton decoration `aria-hidden`; concise `role="status"` label | Pass |
+| `AnimatedPageFallback` respects reduced motion | Pass (implementation) |
+| TanStack Query loading inside feature pages unchanged | Pass |
+| Client and direct navigation at desktop/mobile widths | Manual QA recommended |
+
+## Remaining gaps (non–Phase 7)
 
 - Manual browser QA at multiple breakpoints (automated Jest covers API contracts only).
 - Profile “verified” badge: `GET /api/auth/me` omits `verified` (legacy parity); badge may show “Not verified” unless field is added in a future approved defect fix.
 - Google-only users: change-password may fail server-side (legacy behaviour; no dedicated UX).
-- Phase 7: Netlify deploy smoke tests not run in this phase.
+- Phase 8: Netlify deploy smoke tests not run in this phase.
