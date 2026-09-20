@@ -2,5 +2,9 @@
   command = "npm run build"
   publish = ".next"
 
+[build.environment]
+  # Server handler and build cache embed runtime env (e.g. INTERNAL_KEY). Client static chunks remain scanned.
+  SECRETS_SCAN_OMIT_PATHS = ".netlify/.next/cache/**,.netlify/.next/server/**,.netlify/.next/standalone/**,.netlify/functions-internal/**"
+
 # Next.js App Router and /api Route Handlers are served by Netlify's Next.js integration.
 # Do not add a separate netlify/functions tree for API routes.

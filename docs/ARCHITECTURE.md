@@ -189,6 +189,7 @@ Do not create a password-setup API or UX during parity work. That later feature 
 - Let Netlify detect the Next.js app; do not add or pin a legacy Next.js runtime/plugin.
 - Use the Netlify CLI for deployment-faithful local verification; use `next dev` for UI iteration.
 - Configure MongoDB, JWT, Google, and production cookie/domain variables in Netlify environment settings.
+- Use `GOOGLE_CLIENT_ID` and `NEXT_PUBLIC_GOOGLE_CLIENT_ID` (same public Web client ID). Do not set `OAUTH_CLIENT` on Netlify when it duplicates the public ID — secrets scanning flags the client bundle. `SECRETS_SCAN_OMIT_PATHS` in `netlify.toml` excludes server-only output where runtime secrets are expected.
 - Confirm MongoDB network access accepts Netlify functions before production cutover.
 - Smoke-test a deployed preview for login, cookie persistence, database access, and protected endpoints before production.
 

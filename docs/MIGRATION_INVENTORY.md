@@ -67,7 +67,7 @@ Status key: `[ ]` not started · `[~]` in progress · `[x]` complete
 | --- | --- | --- | --- |
 | [x] | Unknown paths | `Navigate` to `/login` | `app/not-found.js` → `/login` |
 | [x] | Post-login landing | `/transactions` | Same default (`LoginForm`, auth redirect) |
-| [x] | Google client ID | `VITE_GOOGLE_CLIENT_ID` in `main.jsx` | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` in `.env.example`; server uses `OAUTH_CLIENT` |
+| [x] | Google client ID | `VITE_GOOGLE_CLIENT_ID` in `main.jsx` | `NEXT_PUBLIC_GOOGLE_CLIENT_ID` + `GOOGLE_CLIENT_ID` in `.env.example`; `OAUTH_CLIENT` legacy alias |
 
 ---
 
@@ -140,7 +140,8 @@ Committed template: `.env.example` (names only). Runtime values belong in Netlif
 | `MONGO_URI` | Mongoose connection | Existing deployment URI |
 | `JWT_SECRET` | Sign/verify session JWT | Server only |
 | `INTERNAL_KEY` | `create-default` categories | Header `x-internal-key` |
-| `OAUTH_CLIENT` | Google token verification | Primary legacy name |
+| `GOOGLE_CLIENT_ID` | Google token verification | Preferred server name; same value as `NEXT_PUBLIC_GOOGLE_CLIENT_ID` |
+| `OAUTH_CLIENT` | Google token verification | Optional legacy alias (omit on Netlify if it duplicates the public client ID) |
 | `GOOGLE_CLIENT_ID` | Google token verification | Accepted alias in legacy code |
 | `COOKIE_DOMAIN` | Production cookie domain | Optional; e.g. `.example.com` |
 
